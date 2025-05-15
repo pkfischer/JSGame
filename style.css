@@ -1,0 +1,22 @@
+html {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-size: 16px;
+  overscroll-behavior: none;
+}
+
+*{
+  box-sizing: inherit;
+}
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  border: 1px solid;
+}
+
