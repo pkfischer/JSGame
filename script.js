@@ -1,5 +1,5 @@
 // MAIN CODE
-const canvas = document.getElementById("myCanvas");
+const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 let touchStartX = 0;
@@ -7,7 +7,7 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 
-// physics variables
+// physics variables, but best practce is to create an object to hold these
 let xPos = 100;
 let yPos = 200;
 let size = 30;
@@ -26,13 +26,13 @@ function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawChar(xPos, yPos);
   
-  // change 
+  // update
   xPos += xVel;
   yPos += yVel;
   xVel += xAcc;
   yVel += yAcc;
   
-  // collisions
+  // update collisions
   if (yPos + size > canvas.height){
     yVel = -yVel * bounciness;
     yPos = canvas.height - size;
@@ -49,22 +49,6 @@ function animate(){
   
   // repeat
   window.requestAnimationFrame(animate);
-}
-
-// FUNCTIONS
-
-function drawSquare(x, y) {
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x + size, y);
-  ctx.lineTo(x + size, y + size);
-  ctx.lineTo(x, y + size);
-  ctx.lineTo(x, y);
-  ctx.strokeStyle = "#ffbb02";
-  ctx.lineWidth = 3;
-  ctx.fillStyle = "#aa00aa";
-  ctx.fill();
-  ctx.stroke();
 }
 
 function drawChar(x, y) {
@@ -106,7 +90,6 @@ function drawChar(x, y) {
   ctx.stroke();
 }
 
-
 function setupTouch() {
   document.addEventListener("touchstart", (e) => {
     touchStartX = e.changedTouches[0].screenX;
@@ -115,11 +98,11 @@ function setupTouch() {
   document.addEventListener("touchend", (e) => {
     touchEndX = e.changedTouches[0].screenX;
     touchEndY = e.changedTouches[0].screenY;
-    processSwipe();
+    processTouch();
   });
 }
 
-function processSwipe() {
+function processTouch() {
   xVel += (touchEndX - touchStartX) / 20;
   yVel += (touchEndY - touchStartY) / 20;
 }
