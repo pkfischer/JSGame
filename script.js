@@ -15,7 +15,7 @@ let xVel = 0;
 let yVel = 0;
 let xAcc = 0;
 let yAcc = 0.1;        // gravity
-let bounciness = 0.95;  // from 0 - 1
+let bounciness = 0.25;  // from 0 - 1
 
 setupTouch();
 animate();
