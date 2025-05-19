@@ -1,7 +1,20 @@
 // MAIN CODE
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-let cueball = makeBall(160, 200);
+const startX = canvas.width/2;
+const startY = 20;
+let cueball = makeBall(startX, startY, 10, 0.65, "#a9ff30");
+
+let pingPongBall = makeBall(startX, startY, 8, 0.65, "#fcc449");
+let golfBall = makeBall(startX, startY, 12, 0.65, "#e3e3e3");
+let pickleball = makeBall(startX, startY, 17, 0.65, "#a9ff30");
+let handBall = makeBall(startX, startY, 22, 0.65, "#ff4929");
+let softball = makeBall(startX, startY, 27, 0.65, "#ecff1c");
+let volleyball = makeBall(startX, startY, 37, 0.65, "#ffa1f4");
+let bowlingBall = makeBall(startX, startY, 47, 0.65, "#01024d");
+let soccerBall = makeBall(startX, startY, 57, 0.65, "#40cfc3");
+let basketball = makeBall(startX, startY, 70, 0.65, "#d98943");
+let beachBall = makeBall(startX, startY, 100, 0.65, "#a761f2");
 
 
 let touchStartX = 0;
@@ -22,16 +35,18 @@ let bounciness = 0.65;  // from 0 - 1
 setupTouch();
 animate();
 
-function makeBall(x, y){
+function makeBall(x, y, radi, bouncy, col){
   const ball = {
-    size: 10,
+    size: radi,
     xPos: x,
     yPos: y,
     xVel: 2,
     yVel: 1,
     xAcc: 0,
     yAcc: 0,
-    color: "#ff0000",
+    friction: 0.99,
+    bounciness: bouncy,
+    color: col,
     draw: function(){
       ctx.beginPath();
       ctx.arc(this.xPos, this.yPos, this.size, 0, 2 * Math.PI);
@@ -41,6 +56,15 @@ function makeBall(x, y){
     update: function(){
       this.xVel += this.xAcc;
       this.yVel += this.yAcc;
+      this.xVel *= this.friction;
+      this.yVel *= this.friction;
+      if (Math.abs(this.xVel) < .5){
+        this.xVel = 0;
+      }
+      if (Math.abs(this.yVel) < .5){
+        this.yVel = 0;
+
+      }
       this.xPos += this.xVel;
       this.yPos += this.yVel;
       // bounce
@@ -62,8 +86,10 @@ function makeBall(x, y){
       }
     },
     push: function(dX, dY){
-      this.xVel = dX / 20;
-      this.yVel = dY / 20;
+      //this.xVel = dX / 20;
+      //this.yVel = dY / 20;
+      this.xPos = dX;
+      this.yVel += 10;
     }
   }
   return ball
@@ -74,6 +100,19 @@ function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   cueball.draw();
   cueball.update();
+  let num = Math.random()*5+1
+  /*if (num == 1){
+    pingPongBall.draw();
+  } else if (num == 2){
+    golfBall.draw();
+  } else if (num == 3){
+    pickleball.draw();
+  } else if (num == 4){
+    handBall.draw();
+  } else {
+    softball.draw();
+  }
+  */
 
   window.requestAnimationFrame(animate);
 }
@@ -130,7 +169,8 @@ function setupTouch() {
 }
 
 function processTouch() {
-  cueball.push((touchEndX - touchStartX), (touchEndY - touchStartY));
+  //cueball.push((touchEndX - touchStartX), (touchEndY - touchStartY));
+  cueball.push((touchEndX), (touchEndY - touchStartY));
 }
 
 
