@@ -3,18 +3,8 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const startX = canvas.width/2;
 const startY = 20;
-let cueball = makeBall(startX, startY, 10, 0.65, "#a9ff30");
-
-let pingPongBall = makeBall(startX, startY, 8, 0.65, "#fcc449");
-let golfBall = makeBall(startX, startY, 12, 0.65, "#e3e3e3");
-let pickleball = makeBall(startX, startY, 17, 0.65, "#a9ff30");
-let handBall = makeBall(startX, startY, 22, 0.65, "#ff4929");
-let softball = makeBall(startX, startY, 27, 0.65, "#ecff1c");
-let volleyball = makeBall(startX, startY, 37, 0.65, "#ffa1f4");
-let bowlingBall = makeBall(startX, startY, 47, 0.65, "#01024d");
-let soccerBall = makeBall(startX, startY, 57, 0.65, "#40cfc3");
-let basketball = makeBall(startX, startY, 70, 0.65, "#d98943");
-let beachBall = makeBall(startX, startY, 100, 0.65, "#a761f2");
+let cueball = makeBall(startX, startY, "#a9ff30");
+let table = makeTable();
 
 
 let touchStartX = 0;
@@ -22,22 +12,13 @@ let touchStartY = 0;
 let touchEndX = 0;
 let touchEndY = 0;
 
-// physics variables, but best practce is to create an object to hold these
-let xPos = 100;
-let yPos = 200;
-let size = 30;
-let xVel = 0;
-let yVel = 0;
-let xAcc = 0;
-let yAcc = 0.1;        // gravity
-let bounciness = 0.65;  // from 0 - 1
 
 setupTouch();
 animate();
 
-function makeBall(x, y, radi, bouncy, col){
+function makeBall(x, y, col){
   const ball = {
-    size: radi,
+    size: 10,
     xPos: x,
     yPos: y,
     xVel: 2,
@@ -45,7 +26,6 @@ function makeBall(x, y, radi, bouncy, col){
     xAcc: 0,
     yAcc: 0,
     friction: 0.99,
-    bounciness: bouncy,
     color: col,
     draw: function(){
       ctx.beginPath();
@@ -54,16 +34,21 @@ function makeBall(x, y, radi, bouncy, col){
       ctx.fill();
     },
     update: function(){
+      if (table.pocketable(this.xPos, this.yPos)){
+        this.xAcc = 0;
+        this.yAcc = 0;
+        this.xVel = 0;
+        this.yVel = 0;
+        this.xPos = -100;
+        this.yPos = -100;
+      }
       this.xVel += this.xAcc;
       this.yVel += this.yAcc;
       this.xVel *= this.friction;
       this.yVel *= this.friction;
-      if (Math.abs(this.xVel) < .5){
+      if (Math.hypot(this.xVel, this.yVel) < 0.1){
         this.xVel = 0;
-      }
-      if (Math.abs(this.yVel) < .5){
         this.yVel = 0;
-
       }
       this.xPos += this.xVel;
       this.yPos += this.yVel;
@@ -86,33 +71,55 @@ function makeBall(x, y, radi, bouncy, col){
       }
     },
     push: function(dX, dY){
-      //this.xVel = dX / 20;
-      //this.yVel = dY / 20;
-      this.xPos = dX;
-      this.yVel += 10;
+      this.xVel = dX / 20;
+      this.yVel = dY / 20;
     }
   }
   return ball
+}
+
+function makeTable(){
+  const table = 
+  { 
+    pocketRadius: 15,
+    pocketColor: "#222222",
+    pockets : [
+      {x : 4, y : 4},
+      {x : 4, y : canvas.height / 2},
+      {x : 4, y : canvas.height - 4},
+      {x : canvas.width - 4, y : 4},
+      {x : canvas.width - 4, y : canvas.height / 2},
+      {x : canvas.width - 4, y : canvas.height - 4}
+    ],
+    draw: function(){
+      ctx.fillStyle  = "#008000";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      for (const loc of this.pockets){
+        ctx.beginPath();
+        ctx.arc(loc.x, loc.y, this.pocketRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = this.pocketColor;
+        ctx.fill();
+      }
+    },
+    pocketable: function(ballX, ballY){
+      for (const loc of this.pockets){
+        if( Math.hypot(ballX - loc.x, ballY - loc.y) < this.radius){
+          console.log("Pocketed");
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+  return table;
 }
 
 function animate(){
   // draw
   ctx.clearRect(0,0,canvas.width,canvas.height);
   cueball.draw();
+  table.draw();
   cueball.update();
-  let num = Math.random()*5+1
-  /*if (num == 1){
-    pingPongBall.draw();
-  } else if (num == 2){
-    golfBall.draw();
-  } else if (num == 3){
-    pickleball.draw();
-  } else if (num == 4){
-    handBall.draw();
-  } else {
-    softball.draw();
-  }
-  */
 
   window.requestAnimationFrame(animate);
 }
