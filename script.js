@@ -116,9 +116,8 @@ function makeTable(){
 
 function animate(){
   // draw
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  cueball.draw();
   table.draw();
+  cueball.draw();
   cueball.update();
 
   window.requestAnimationFrame(animate);
